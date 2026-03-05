@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <IsPackable>false</IsPackable>
+        <GenerateProgramFile>false</GenerateProgramFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="ANumberOfDegreesTests.fs" />
+        <Compile Include="FactorialTests.fs" />
+        <Compile Include="NumberSearchTests.fs" />
+        <Compile Include="ReverseListTests.fs" />
+        <Compile Include="FibonacciTests.fs" />
+        <Compile Include="Program.fs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.2"/>
+        <PackageReference Include="FsCheck" Version="3.3.2" />
+        <PackageReference Include="FsUnit" Version="7.1.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
+        <PackageReference Include="NUnit" Version="4.2.2"/>
+        <PackageReference Include="NUnit.Analyzers" Version="4.4.0"/>
+        <PackageReference Include="NUnit3TestAdapter" Version="4.6.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\homework_25_02_2026\homework_25_02_2026.fsproj" />
+    </ItemGroup>
+
+</Project>

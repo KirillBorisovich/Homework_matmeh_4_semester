@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="homework_25_02_2026.Tests/homework_25_02_2026.Tests.fsproj" />
+  <Project Path="homework_25_02_2026/homework_25_02_2026.fsproj" />
+</Solution>
