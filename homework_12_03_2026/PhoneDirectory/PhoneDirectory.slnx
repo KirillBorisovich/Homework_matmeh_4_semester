@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PhoneDirectory.Tests/PhoneDirectory.Tests.fsproj" />
+  <Project Path="PhoneDirectory/PhoneDirectory.fsproj" />
+</Solution>

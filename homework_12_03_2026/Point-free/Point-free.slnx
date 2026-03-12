@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Point-free.Tests/Point-free.Tests.fsproj" />
+  <Project Path="Point-free/Point-free.fsproj" />
+</Solution>
