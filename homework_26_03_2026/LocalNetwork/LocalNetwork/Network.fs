@@ -15,7 +15,7 @@ let private random = Random()
 let private isInfected probability = random.NextDouble() < probability
 
 let private makeAMove infectionProbability (pcArray: Computer[]) (adjacencyMatrix: int[,]) =
-    let infectionSet = HashSet<Computer>()
+    let infectionSet = HashSet<int * Computer>()
 
     let rec infectTheNeighbors indexPC (pcArray: Computer[]) (arrayOfNeighbors: int[]) acc =
         if acc >= arrayOfNeighbors.Length then
@@ -28,7 +28,7 @@ let private makeAMove infectionProbability (pcArray: Computer[]) (adjacencyMatri
                 match pcArray[acc] with
                 | item when item.IsInfected = true -> infectTheNeighbors indexPC pcArray arrayOfNeighbors (acc + 1)
                 | item when item.IsInfected = false ->
-                    infectionSet.Add(item) |> ignore
+                    infectionSet.Add((acc, item)) |> ignore
                     infectTheNeighbors indexPC pcArray arrayOfNeighbors (acc + 1)
                 | _ -> ()
             | _ -> ()
@@ -36,7 +36,9 @@ let private makeAMove infectionProbability (pcArray: Computer[]) (adjacencyMatri
     let rec makeAMoveInternal (pcArray: Computer[]) (adjacencyMatrix: int[,]) acc =
         if acc >= adjacencyMatrix.GetLength 0 then
             infectionSet
-            |> Seq.iter (fun x -> x.IsInfected <- x.pcOC |> infectionProbability |> isInfected)
+            |> Seq.iter (fun item ->
+                let pc = snd item
+                pc.IsInfected <- pc.pcOC |> infectionProbability |> isInfected)
         else
             if pcArray[acc].IsInfected then
                 infectTheNeighbors acc pcArray adjacencyMatrix[acc, *] 0
