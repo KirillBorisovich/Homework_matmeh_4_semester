@@ -1,3 +1,7 @@
+// <copyright file="Task1Tests.fs" company="Bengya Kirill">
+// Copyright (c) Bengya Kirill under MIT License.
+// </copyright>
+
 module Test.Tests.Task1Tests
 
 open NUnit.Framework

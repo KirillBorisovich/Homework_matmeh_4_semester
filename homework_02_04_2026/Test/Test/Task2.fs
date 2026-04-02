@@ -1,4 +1,4 @@
-// <copyright file="Task1.fs" company="Bengya Kirill">
+// <copyright file="Task2.fs" company="Bengya Kirill">
 // Copyright (c) Bengya Kirill under MIT License.
 // </copyright>
 
