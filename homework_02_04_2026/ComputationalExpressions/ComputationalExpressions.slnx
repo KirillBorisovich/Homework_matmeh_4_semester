@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ComputationalExpressions.Tests/ComputationalExpressions.Tests.fsproj" />
+  <Project Path="ComputationalExpressions/ComputationalExpressions.fsproj" />
+</Solution>
