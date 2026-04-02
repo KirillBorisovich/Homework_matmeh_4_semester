@@ -10,12 +10,10 @@ open Test.Task2
 
 
 [<Test>]
-let ``getSquare 1 should return single star`` () =
-    getSquare 1 |> should equal "*\n"
+let ``getSquare 1 should return single star`` () = getSquare 1 |> should equal "*\n"
 
 [<Test>]
-let ``getSquare 2 should return 2x2 square`` () =
-    getSquare 2 |> should equal "**\n**"
+let ``getSquare 2 should return 2x2 square`` () = getSquare 2 |> should equal "**\n**"
 
 [<Test>]
 let ``getSquare 4 should return 4x4 square`` () =
