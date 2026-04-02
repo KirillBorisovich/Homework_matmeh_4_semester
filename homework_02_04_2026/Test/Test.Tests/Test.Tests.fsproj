@@ -4,13 +4,12 @@
         <TargetFramework>net9.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <IsPackable>false</IsPackable>
-        <GenerateProgramFile>false</GenerateProgramFile>
+        <GenerateProgramFile>true</GenerateProgramFile>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Include="Task1Tests.fs" />
         <Compile Include="Task2Tests.fs" />
-        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
