@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MiniCrawler.Tests/MiniCrawler.Tests.fsproj" />
+  <Project Path="MiniCrawler/MiniCrawler.fsproj" />
+</Solution>
