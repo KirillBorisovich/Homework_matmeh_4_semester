@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BlockingQueue.Tests/BlockingQueue.Tests.fsproj" />
+  <Project Path="BlockingQueue\BlockingQueue.fsproj" />
+</Solution>
