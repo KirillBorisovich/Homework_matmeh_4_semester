@@ -1,19 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <IsPackable>false</IsPackable>
-        <GenerateProgramFile>false</GenerateProgramFile>
+        <GenerateProgramFile>true</GenerateProgramFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="ANumberOfDegreesTests.fs" />
+        <Compile Include="ListOfPowersTests.fs" />
         <Compile Include="FactorialTests.fs" />
         <Compile Include="NumberSearchTests.fs" />
         <Compile Include="ReverseListTests.fs" />
         <Compile Include="FibonacciTests.fs" />
-        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
