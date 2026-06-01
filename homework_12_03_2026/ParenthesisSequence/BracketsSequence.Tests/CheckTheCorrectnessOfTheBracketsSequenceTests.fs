@@ -2,19 +2,17 @@
 
 open NUnit.Framework
 open FsUnit
-open CheckTheCorrectnessOfTheBracketsSequence
+open BracketChecker
 
 [<TestCase("[fsd]sdf{sdf}(sdf)")>]
 [<TestCase("[asfdsd{asdf()fds}]xcv")>]
 [<TestCase("{[jkjkl(ljkjlk)]}")>]
 [<TestCase("asdfadsfdasf")>]
 [<TestCase("")>]
-let ``should return true`` n =
-    checkTheCorrectnessOfTheBracketsSequence n |> should be True
+let ``should return true`` input = isBalanced input |> should be True
 
 [<TestCase("[{}")>]
 [<TestCase("[{)]")>]
 [<TestCase("[{}])")>]
 [<TestCase("[{}(])")>]
-let ``should return false`` n =
-    checkTheCorrectnessOfTheBracketsSequence n |> should be False
+let ``should return false`` input = isBalanced input |> should be False
