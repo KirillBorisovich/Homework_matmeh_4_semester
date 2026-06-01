@@ -3,7 +3,7 @@ module PhoneDirectory.Front
 open System
 open PhoneDirectory.PhoneBook
 
-let rec front (book: PhoneBook) =
+let rec run (book: PhoneBook) =
     printfn
         """
 Phone directory
@@ -33,36 +33,46 @@ Enter number for:
             let name = Console.ReadLine()
             printf "Enter phone: "
             let phone = Console.ReadLine()
-            let newBook = add book name phone
+            let newBook = add book (Name name) (PhoneNumber phone)
             printfn "Entry added."
-            front newBook
+            run newBook
         | 2 ->
             printf "Enter name: "
             let name = Console.ReadLine()
 
-            match findPhoneByName book name with
-            | Some phoneList -> phoneList |> List.iter (fun contact -> printfn $"Phone: %s{contact.Phone}")
+            match findPhoneByName book (Name name) with
+            | Some phones ->
+                let count = Set.count phones
+                printfn $"Found %d{count} entries:"
+                phones |> Set.iter (fun (PhoneNumber p) -> printfn $"%s{p}")
             | None -> printfn "Name not found."
 
-            front book
+            run book
         | 3 ->
             printf "Enter phone: "
             let phone = Console.ReadLine()
 
-            match findNameByNumber book phone with
-            | Some nameList -> nameList |> List.iter (fun contact -> printfn $"Name: %s{contact.Name}")
+            match findNameByNumber book (PhoneNumber phone) with
+            | Some names ->
+                let count = Set.count names
+                printfn $"Found %d{count} entries:"
+                names |> Set.iter (fun (Name n) -> printfn $"%s{n}")
             | None -> printfn "Phone not found."
 
-            front book
+            run book
         | 4 ->
             let contacts = toSeq book
 
             if Seq.isEmpty contacts then
                 printfn "The phone book is empty."
             else
-                contacts |> Seq.iter (fun c -> printfn $"%s{c.Name}: %s{c.Phone}")
+                contacts
+                |> Seq.iter (fun c ->
+                    let (Name n) = c.Name
+                    let (PhoneNumber p) = c.Phone
+                    printfn $"%s{n}: %s{p}")
 
-            front book
+            run book
         | 5 ->
             printf "Enter file path to save: "
             let path = Console.ReadLine()
@@ -73,27 +83,27 @@ Enter number for:
             with ex ->
                 printfn $"Error saving file: %s{ex.Message}"
 
-            front book
+            run book
         | 6 ->
             printf "Enter file path to load: "
             let path = Console.ReadLine()
 
             try
                 match readFromFile book path with
-                | Some(newPhoneBook) ->
+                | Some newPhoneBook ->
                     printfn "Data loaded from file."
-                    front newPhoneBook
+                    run newPhoneBook
                 | None ->
                     printfn "File not found or could not be read."
-                    front book
+                    run book
             with ex ->
                 printfn $"Error reading file: %s{ex.Message}"
-                front book
+                run book
         | _ ->
             printfn "Unknown command. Please enter a number between 0 and 6."
-            front book
+            run book
     | false, _ ->
         printfn "Invalid input. Please enter a number."
-        front book
+        run book
 
-let initialization () = front createPhoneBook
+let start () = run (createPhoneBook ())

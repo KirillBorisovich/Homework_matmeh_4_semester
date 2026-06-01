@@ -2,51 +2,48 @@ module PhoneDirectory.PhoneBook
 
 open System.IO
 
-type Contact = { Name: string; Phone: string }
+type Name = Name of string
+type PhoneNumber = PhoneNumber of string
+type Contact = { Name: Name; Phone: PhoneNumber }
 
 type PhoneBook =
     private
-        { ByName: Map<string, list<Contact>>
-          ByPhone: Map<string, list<Contact>> }
+        { ByName: Map<Name, Set<PhoneNumber>>
+          ByPhone: Map<PhoneNumber, Set<Name>> }
 
-let createPhoneBook =
+let createPhoneBook () =
     { ByName = Map.empty
       ByPhone = Map.empty }
 
-let add phoneBook name phone =
-    let addAContactToASeparateMap (map: Map<string, list<Contact>>) key contact =
-        map.Change(
-            key,
-            function
-            | Some contacts ->
-                let numberOfTheSameEntries =
-                    contacts
-                    |> List.filter (fun x -> x.Name = contact.Name && x.Phone = contact.Phone)
-                    |> List.length
+let add phoneBook (name: Name) (phone: PhoneNumber) =
+    let updatedByName =
+        phoneBook.ByName
+        |> Map.change name (fun existing -> Some(existing |> Option.defaultValue Set.empty |> Set.add phone))
 
-                if numberOfTheSameEntries = 0 then
-                    Some(contact :: contacts)
-                else
-                    Some(contacts)
+    let updatedByPhone =
+        phoneBook.ByPhone
+        |> Map.change phone (fun existing -> Some(existing |> Option.defaultValue Set.empty |> Set.add name))
 
-            | None -> Some [ contact ]
-        )
-
-    let contact = { Name = name; Phone = phone }
-
-    { ByName = addAContactToASeparateMap phoneBook.ByName contact.Name contact
-      ByPhone = addAContactToASeparateMap phoneBook.ByPhone contact.Phone contact }
+    { ByName = updatedByName
+      ByPhone = updatedByPhone }
 
 let findPhoneByName phonebook name = phonebook.ByName.TryFind(name)
 
 let findNameByNumber phonebook phone = phonebook.ByPhone.TryFind(phone)
 
 let toSeq phoneBook =
-    phoneBook.ByName |> Map.toList |> List.map snd |> Seq.concat
+    phoneBook.ByName
+    |> Map.toSeq
+    |> Seq.collect (fun (name, phones) -> phones |> Seq.map (fun phone -> { Name = name; Phone = phone }))
 
 let writeToFile phoneBook path =
     let data =
-        phoneBook |> toSeq |> Seq.map (fun contact -> $"{contact.Name} {contact.Phone}")
+        phoneBook
+        |> toSeq
+        |> Seq.map (fun contact ->
+            let (Name nameStr) = contact.Name
+            let (PhoneNumber phoneStr) = contact.Phone
+            $"{nameStr} {phoneStr}")
 
     File.WriteAllLines(path, data)
 
@@ -58,7 +55,13 @@ let readFromFile phoneBook path =
         |> Array.toList
         |> List.fold
             (fun acc str ->
-                let index = str.IndexOf(' ')
-                add acc (str.Substring(0, index)) (str.Substring(index + 1)))
+                let parts = str.Split([| ' ' |], 2)
+
+                if parts.Length >= 2 then
+                    let name = Name parts[0]
+                    let phone = PhoneNumber parts[1]
+                    add acc name phone
+                else
+                    acc)
             phoneBook
         |> Some

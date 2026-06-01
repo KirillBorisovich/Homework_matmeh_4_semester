@@ -2,5 +2,5 @@
 
 [<EntryPoint>]
 let main _ =
-    initialization ()
+    start ()
     0
