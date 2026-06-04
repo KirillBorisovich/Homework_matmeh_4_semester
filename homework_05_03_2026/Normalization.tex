@@ -1,0 +1,15 @@
+\documentclass{article}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+
+\begin{document}
+
+\begin{align*}
+& ((\lambda a . (\lambda b . b \ b) (\lambda b . b \ b) ) \ b) \ ((\lambda c . (c \ b)) (\lambda a . a)) \rightarrow_\beta \
+\\ & ((\lambda b . b \ b) (\lambda b . b \ b)) \ ((\lambda c . (c \ b)) (\lambda a . a)) \rightarrow_\beta \
+\\ & ((\lambda b . b \ b) (\lambda b . b \ b)) \ ((\lambda c . (c \ b)) (\lambda a . a))
+\end{align*}
+
+\textbf{Ответ:} Данный терм не имеет нормальной формы. В процессе редукции возникает комбинатор, который на каждом шаге бесконечно редуцируется сам в себя.
+
+\end{document}
