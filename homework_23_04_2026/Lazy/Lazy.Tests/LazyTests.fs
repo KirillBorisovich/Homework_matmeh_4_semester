@@ -10,6 +10,25 @@ open System.Threading.Tasks
 open FsUnit
 open NUnit.Framework
 
+let threadCount = Environment.ProcessorCount * 4
+
+let createMockSupplier =
+    let mutable callCount = 0
+
+    let supplier =
+        fun () ->
+            Thread.Sleep(50)
+            Interlocked.Increment(&callCount) |> ignore
+            Guid.NewGuid()
+
+    supplier, (fun () -> callCount)
+
+let tasks (barrier: Barrier) (lazyValue: ILazy<'T>) =
+    [| for _ in 1..threadCount ->
+           Task.Run(fun () ->
+               barrier.SignalAndWait()
+               lazyValue.Get()) |]
+
 [<Test>]
 let ``singleThreaded Get should return correct value`` () =
     let lazyValue = LazyFactory.singleThreaded (fun () -> 42)
@@ -42,31 +61,22 @@ let ``singleThreaded supplier should be called only once`` () =
     callCount |> should equal 1
 
 [<Test>]
-let ``SingleThreadedLazy Get should return correct value`` () =
-    let lazyValue = LazyFactory.SingleThreadedLazy(fun () -> "test")
+let ``multiThreadLazyWithLock Get should return correct value`` () =
+    let lazyValue = LazyFactory.multiThreadLazyWithLock (fun () -> "test")
     lazyValue.Get() |> should equal "test"
 
 [<Test>]
-let ``SingleThreadedLazy supplier should be called only once in multithreaded environment`` () =
-    let mutable callCount = 0
+let ``multiThreadLazyWithLock supplier should be called only once in multithreaded environment`` () =
+    task {
+        let supplier, getCallCount = createMockSupplier
+        let lazyValue = LazyFactory.multiThreadLazyWithLock supplier
+        use barrier = new Barrier(threadCount)
 
-    let supplier =
-        fun () ->
-            Thread.Sleep(50)
-            Interlocked.Increment(&callCount) |> ignore
-            Guid.NewGuid()
+        let! results = tasks barrier lazyValue |> Task.WhenAll
 
-    let lazyValue = LazyFactory.SingleThreadedLazy supplier
-
-    let tasks =
-        [| for _ in 1..100 -> Task.Run(fun () -> lazyValue.Get()) |] |> Task.WhenAll
-
-    let results = tasks.Result
-
-    callCount |> should equal 1
-
-    let distinctResults = results |> Array.distinct
-    distinctResults.Length |> should equal 1
+        getCallCount () |> should equal 1
+        (results |> Array.distinct).Length |> should equal 1
+    }
 
 [<Test>]
 let ``multiThreadLazyWithoutLock Get should return correct value in single-threaded environment`` () =
@@ -75,22 +85,14 @@ let ``multiThreadLazyWithoutLock Get should return correct value in single-threa
 
 [<Test>]
 let ``multiThreadLazyWithoutLock should return same value for all threads`` () =
-    let mutable callCount = 0
+    task {
+        let supplier, getCallCount = createMockSupplier
+        let lazyValue = LazyFactory.multiThreadLazyWithoutLock supplier
 
-    let supplier =
-        fun () ->
-            Thread.Sleep(50)
-            Interlocked.Increment(&callCount) |> ignore
-            Guid.NewGuid()
+        use barrier = new Barrier(threadCount)
 
-    let lazyValue = LazyFactory.multiThreadLazyWithoutLock supplier
+        let! results = tasks barrier lazyValue |> Task.WhenAll
 
-    let tasks =
-        [| for _ in 1..100 -> Task.Run(fun () -> lazyValue.Get()) |] |> Task.WhenAll
-
-    let results = tasks.Result
-
-    let distinctResults = results |> Array.distinct
-    distinctResults.Length |> should equal 1
-
-    callCount |> should be (greaterThanOrEqualTo 1)
+        (results |> Array.distinct).Length |> should equal 1
+        getCallCount () |> should be (greaterThanOrEqualTo 1)
+    }

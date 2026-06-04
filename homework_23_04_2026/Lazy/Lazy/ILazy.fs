@@ -10,7 +10,9 @@ type ILazy<'T> =
     abstract Get: unit -> 'T
 
 module LazyFactory =
-    type Box<'T> = { Value: 'T }
+    [<AllowNullLiteral>]
+    type Box<'T>(value: 'T) =
+        member _.Value = value
 
     let singleThreaded supplier =
         let mutable result = Unchecked.defaultof<'T>
@@ -25,38 +27,37 @@ module LazyFactory =
                 result }
 
     let multiThreadLazyWithoutLock supplier =
-        let mutable result: Box<'T> = Unchecked.defaultof<Box<'T>>
+        let mutable result: Box<'T> = null
 
         { new ILazy<'T> with
             member this.Get() =
                 let current = result
 
-                if not (obj.ReferenceEquals(current, Unchecked.defaultof<Box<'T>>)) then
+                if not (obj.ReferenceEquals(current, null)) then
                     current.Value
                 else
-                    let computed = { Value = supplier () }
+                    let computed = Box(supplier ())
 
-                    let swapped =
-                        Interlocked.CompareExchange(&result, computed, Unchecked.defaultof<Box<'T>>)
+                    let swapped = Interlocked.CompareExchange(&result, computed, null)
 
-                    if obj.ReferenceEquals(swapped, Unchecked.defaultof<Box<'T>>) then
+                    if obj.ReferenceEquals(swapped, null) then
                         computed.Value
                     else
                         swapped.Value }
 
 
-    let SingleThreadedLazy supplier =
+    let multiThreadLazyWithLock supplier =
         let mutable result = Unchecked.defaultof<'T>
         let mutable isCalculated = false
         let lockObject = obj ()
 
         { new ILazy<'T> with
             member this.Get() =
-                if not isCalculated then
+                if not (Volatile.Read(&isCalculated)) then
                     lock lockObject (fun () ->
-                        if not isCalculated then
+                        if not (Volatile.Read(&isCalculated)) then
                             result <- supplier ()
-                            isCalculated <- true)
+                            Volatile.Write(&isCalculated, true))
 
 
                 result }
