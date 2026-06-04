@@ -4,9 +4,23 @@
 
 \begin{document}
 
+Правила редукции для комбинаторов $S$, $K$ и $I$:
 \begin{align*}
-(S K K) x \rightarrow_\beta \ & K x (K x) \rightarrow_\beta \ x = I x
+S x y z &\rightarrow_\beta x z (y z) \\
+K x y &\rightarrow_\beta x \\
+I x &\rightarrow_\beta x
 \end{align*}
+
+На первом шаге применяем комбинатор $S$, на втором — комбинатор $K$:
+\begin{align*}
+(S K K) x &\rightarrow_\beta K x (K x) \\
+&\rightarrow_\beta x
+\end{align*}
+
+Так как по определению $I x \rightarrow_\beta x$, мы получаем равенство результатов:
+\[ (S K K) x \rightarrow_\beta^* x = I x \]
+
+Аксиома экстенсиональности утверждает, что если две функции возвращают одинаковый результат для любого аргумента $x$ (то есть $F x = G x$), то эти функции тождественны ($F = G$).
 
 Так как $(S K K) x = I x$ для любого $x$, по аксиоме экстенсиональности:
 \[ S K K = I \]
